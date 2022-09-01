@@ -162,7 +162,6 @@ class FileRepository {
     for (var i = 0; i < contentLineByLine!.length; i++) {
       if (contentLineByLine[i].contains('applicationId')) {
         contentLineByLine[i] = '        applicationId \"$bundleId\"';
-        break;
       }
 
       if (contentLineByLine[i].contains('manifestPlaceholders')) {
@@ -171,6 +170,7 @@ class FileRepository {
         break;
       }
     }
+    logger.i('New VERSION DETECTED');
     var writtenFile = await writeFile(
       filePath: androidAppBuildGradlePath,
       content: contentLineByLine.join('\n'),

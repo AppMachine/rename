@@ -1,3 +1,6 @@
+## 2.0.2
+- Add extra manifestPlaceholder parameter android appSchemeAuthUrl
+
 ## 2.0.1
 
 - Making null-safety version as default

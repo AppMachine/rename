@@ -162,7 +162,6 @@ class FileRepository {
     for (var i = 0; i < contentLineByLine!.length; i++) {
       if (contentLineByLine[i].contains('applicationId')) {
         contentLineByLine[i] = '        applicationId \"$bundleId\"';
-        break;
       }
 
       if (contentLineByLine[i].contains('manifestPlaceholders')) {

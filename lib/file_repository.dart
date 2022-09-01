@@ -171,6 +171,7 @@ class FileRepository {
         break;
       }
     }
+    logger.i('New VERSION DETECTED');
     var writtenFile = await writeFile(
       filePath: androidAppBuildGradlePath,
       content: contentLineByLine.join('\n'),

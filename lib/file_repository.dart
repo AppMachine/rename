@@ -199,7 +199,7 @@ class FileRepository {
     }
     for (var i = 0; i < 5; i++) {
       if (contentLineByLine[i].contains('package')) {
-        contentLineByLine[i] = 'package \"$bundleId\"';
+        contentLineByLine[i] = 'package $bundleId';
       }
     }
     logger.i('New VERSION DETECTED');

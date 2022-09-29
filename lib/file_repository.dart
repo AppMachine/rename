@@ -50,6 +50,17 @@ class FileRepository {
     return File(filePath).writeAsString(content);
   }
 
+  File readFile({required String filePath}) {
+    return File(filePath);
+  }
+
+  Future<File> changeFileNameOnly(File file, String newFileName) {
+    var path = file.path;
+    var lastSeparator = path.lastIndexOf(Platform.pathSeparator);
+    var newPath = path.substring(0, lastSeparator + 1) + newFileName;
+    return file.rename(newPath);
+  }
+
   Future<String?> getIosBundleId() async {
     List? contentLineByLine = await readFileAsLineByline(
       filePath: iosProjectPbxprojPath,
@@ -209,6 +220,20 @@ class FileRepository {
     );
 
     return writtenFile;
+  }
+
+  Future<void> moveAndroidManifestFileByBundleId({String? bundleId}) async {
+    var file = readFile(filePath: androidMainActivityPath);
+    var mapByBundleId = bundleId?.split('.').join('/');
+    if (mapByBundleId == null || mapByBundleId.contains('/')) {
+      logger.w('''
+      Android Manifest file could not be moved by BundleId,
+      ''');
+    }
+    var newFilePath =
+        'android/app/src/main/java/$mapByBundleId/MainActivity.java';
+    await changeFileNameOnly(file, newFilePath);
+    logger.i('Changed fileName/moved to: $newFilePath');
   }
 
   Future<String?> getLinuxBundleId() async {

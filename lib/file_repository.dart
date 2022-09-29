@@ -9,6 +9,8 @@ class FileRepository {
       '.\\android\\app\\src\\main\\AndroidManifest.xml';
   String iosInfoPlistPath = '.\\ios\\Runner\\Info.plist';
   String androidAppBuildGradlePath = '.\\android\\app\\build.gradle';
+  String androidMainActivityPath =
+      '.\\android\\app\\src\\main\\java\\com\\appmachine\\mobileclient\\MainActivity.java';
   String iosProjectPbxprojPath = '.\\ios\\Runner.xcodeproj\\project.pbxproj';
   String macosAppInfoxprojPath = '.\\macos\\Runner\\Configs\\AppInfo.xcconfig';
   String launcherIconPath = '.\\assets\\images\\launcherIcon.png';
@@ -176,6 +178,34 @@ class FileRepository {
       content: contentLineByLine.join('\n'),
     );
     logger.i('Android bundleId changed successfully to : $bundleId');
+    return writtenFile;
+  }
+
+  Future<File?> changeAndroidBundleIdManifest({String? bundleId}) async {
+    List? contentLineByLine = await readFileAsLineByline(
+      filePath: androidMainActivityPath,
+    );
+    if (checkFileExists(contentLineByLine)) {
+      logger.w('''
+      Android BundleId could not be changed because,
+      The related file could not be found in that path:  $androidAppBuildGradlePath
+      ''');
+      return null;
+    }
+    if (contentLineByLine == null) {
+      return null;
+    }
+    for (var i = 0; i < 5; i++) {
+      if (contentLineByLine[i].contains('package')) {
+        contentLineByLine[i] = 'package \"$bundleId\"';
+      }
+    }
+    logger.i('New VERSION DETECTED');
+    var writtenFile = await writeFile(
+      filePath: androidAppBuildGradlePath,
+      content: contentLineByLine.join('\n'),
+    );
+
     return writtenFile;
   }
 

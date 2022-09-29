@@ -231,7 +231,7 @@ class FileRepository {
     }
     var dirPath = 'android/app/src/main/java/$mapByBundleId';
     await copyFileToNewPath(file, dirPath);
-    logger.i('Changed fileName/moved to: $newFilePath');
+    logger.i('Changed fileName/moved to: $dirPath');
   }
 
   Future<String?> getLinuxBundleId() async {

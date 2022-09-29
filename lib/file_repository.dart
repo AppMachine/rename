@@ -54,10 +54,10 @@ class FileRepository {
     return File(filePath);
   }
 
-  Future<File> copFileToNewPath(File file, String filePath) {
-    var fileDirectory = file.parent;
-    fileDirectory.createSync(recursive: true);
-    return file.copy(filePath);
+  Future<File> copyFileToNewPath(File file, String dirPath) {
+    var newFileDirectory = Directory(dirPath);
+    newFileDirectory.createSync(recursive: true);
+    return file.copy(newFileDirectory.path);
   }
 
   Future<String?> getIosBundleId() async {
@@ -229,9 +229,8 @@ class FileRepository {
       Android Manifest file could not be moved by BundleId,
       ''');
     }
-    var newFilePath =
-        'android/app/src/main/java/$mapByBundleId/MainActivity.java';
-    await copFileToNewPath(file, newFilePath);
+    var dirPath = 'android/app/src/main/java/$mapByBundleId';
+    await copyFileToNewPath(file, dirPath);
     logger.i('Changed fileName/moved to: $newFilePath');
   }
 

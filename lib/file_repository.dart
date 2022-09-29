@@ -54,11 +54,8 @@ class FileRepository {
     return File(filePath);
   }
 
-  Future<File> changeFileNameOnly(File file, String newFileName) {
-    var path = file.path;
-    var lastSeparator = path.lastIndexOf(Platform.pathSeparator);
-    var newPath = path.substring(0, lastSeparator + 1) + newFileName;
-    return file.rename(newPath);
+  Future<File> copFileToNewPath(File file, String filePath) {
+    return file.copy(filePath);
   }
 
   Future<String?> getIosBundleId() async {
@@ -232,7 +229,7 @@ class FileRepository {
     }
     var newFilePath =
         'android/app/src/main/java/$mapByBundleId/MainActivity.java';
-    await changeFileNameOnly(file, newFilePath);
+    await copFileToNewPath(file, newFilePath);
     logger.i('Changed fileName/moved to: $newFilePath');
   }
 

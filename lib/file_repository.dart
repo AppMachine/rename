@@ -159,7 +159,7 @@ class FileRepository {
     if (checkFileExists(contentLineByLine)) {
       logger.w('''
       Android BundleId could not be changed because,
-      The related file could not be found in that path:  $androidMainActivityPath
+      The related file could not be found in that path:  $androidAppBuildGradlePath
       ''');
       return null;
     }
@@ -190,7 +190,7 @@ class FileRepository {
     if (checkFileExists(contentLineByLine)) {
       logger.w('''
       Android BundleId could not be changed because,
-      The related file could not be found in that path:  $androidAppBuildGradlePath
+      The related file could not be found in that path:  $androidMainActivityPath
       ''');
       return null;
     }
@@ -204,7 +204,7 @@ class FileRepository {
     }
     logger.i('New VERSION DETECTED');
     var writtenFile = await writeFile(
-      filePath: androidAppBuildGradlePath,
+      filePath: androidMainActivityPath,
       content: contentLineByLine.join('\n'),
     );
 

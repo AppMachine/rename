@@ -25,6 +25,8 @@ class FileRepository {
       androidManifestPath = 'android/app/src/main/AndroidManifest.xml';
       iosInfoPlistPath = 'ios/Runner/Info.plist';
       androidAppBuildGradlePath = 'android/app/build.gradle';
+      androidMainActivityPath =
+          'android/app/src/main/java/com/appmachine/mobileclient/MainActivity.java';
       iosProjectPbxprojPath = 'ios/Runner.xcodeproj/project.pbxproj';
       macosAppInfoxprojPath = 'macos/Runner/Configs/AppInfo.xcconfig';
       launcherIconPath = 'assets/images/launcherIcon.png';
@@ -157,7 +159,7 @@ class FileRepository {
     if (checkFileExists(contentLineByLine)) {
       logger.w('''
       Android BundleId could not be changed because,
-      The related file could not be found in that path:  $androidAppBuildGradlePath
+      The related file could not be found in that path:  $androidMainActivityPath
       ''');
       return null;
     }

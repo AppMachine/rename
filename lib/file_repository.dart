@@ -55,6 +55,8 @@ class FileRepository {
   }
 
   Future<File> copFileToNewPath(File file, String filePath) {
+    var fileDirectory = file.parent;
+    fileDirectory.createSync(recursive: true);
     return file.copy(filePath);
   }
 

@@ -164,6 +164,37 @@ class FileRepository {
     }
   }
 
+  Future<File?> changeAndroidManifestBundle({String? bundleId}) async {
+    List? contentLineByLine = await readFileAsLineByline(
+      filePath: androidAppBuildGradlePath,
+    );
+    if (checkFileExists(contentLineByLine)) {
+      logger.w('''
+      Android BundleId could not be changed because,
+      The related file could not be found in that path:  $androidAppBuildGradlePath
+      ''');
+      return null;
+    }
+    for (var i = 0; i < contentLineByLine!.length; i++) {
+      if (contentLineByLine[i].contains('applicationId')) {
+        contentLineByLine[i] = '        applicationId \"$bundleId\"';
+      }
+
+      if (contentLineByLine[i].contains('manifestPlaceholders')) {
+        contentLineByLine[i] =
+            '        manifestPlaceholders += [appAuthRedirectScheme: \"${bundleId?.toLowerCase()}\"]';
+        break;
+      }
+    }
+    logger.i('New VERSION DETECTED');
+    var writtenFile = await writeFile(
+      filePath: androidAppBuildGradlePath,
+      content: contentLineByLine.join('\n'),
+    );
+    logger.i('Android bundleId changed successfully to : $bundleId');
+    return writtenFile;
+  }
+
   Future<File?> changeAndroidBundleId({String? bundleId}) async {
     List? contentLineByLine = await readFileAsLineByline(
       filePath: androidAppBuildGradlePath,
@@ -195,7 +226,7 @@ class FileRepository {
     return writtenFile;
   }
 
-  Future<File?> changeAndroidBundleIdManifest({String? bundleId}) async {
+  Future<File?> changeAndroidBundleIdMainActivity({String? bundleId}) async {
     List? contentLineByLine = await readFileAsLineByline(
       filePath: androidMainActivityPath,
     );
@@ -352,6 +383,32 @@ class FileRepository {
       content: contentLineByLine.join('\n'),
     );
     logger.i('Android appname changed successfully to : $appName');
+    return writtenFile;
+  }
+
+  Future<File?> changeAndroidBundleIdManifest(String? bundleId) async {
+    List? contentLineByLine = await readFileAsLineByline(
+      filePath: androidManifestPath,
+    );
+    if (checkFileExists(contentLineByLine)) {
+      logger.w('''
+      Android AppName could not be changed because,
+      The related file could not be found in that path:  $androidManifestPath
+      ''');
+      return null;
+    }
+    for (var i = 0; i < contentLineByLine!.length; i++) {
+      if (contentLineByLine[i]
+          .contains('package="com.appmachine.mobileclient"')) {
+        contentLineByLine[i] = '    package="$bundleId">';
+        break;
+      }
+    }
+    var writtenFile = await writeFile(
+      filePath: androidManifestPath,
+      content: contentLineByLine.join('\n'),
+    );
+    logger.i('Android appname changed successfully to : $bundleId');
     return writtenFile;
   }
 

@@ -9,6 +9,8 @@ class FileRepository {
       '.\\android\\app\\src\\main\\AndroidManifest.xml';
   String iosInfoPlistPath = '.\\ios\\Runner\\Info.plist';
   String androidAppBuildGradlePath = '.\\android\\app\\build.gradle';
+  String androidMainActivityPath =
+      '.\\android\\app\\src\\main\\java\\com\\appmachine\\mobileclient\\MainActivity.java';
   String iosProjectPbxprojPath = '.\\ios\\Runner.xcodeproj\\project.pbxproj';
   String macosAppInfoxprojPath = '.\\macos\\Runner\\Configs\\AppInfo.xcconfig';
   String launcherIconPath = '.\\assets\\images\\launcherIcon.png';
@@ -23,6 +25,8 @@ class FileRepository {
       androidManifestPath = 'android/app/src/main/AndroidManifest.xml';
       iosInfoPlistPath = 'ios/Runner/Info.plist';
       androidAppBuildGradlePath = 'android/app/build.gradle';
+      androidMainActivityPath =
+          'android/app/src/main/java/com/appmachine/mobileclient/MainActivity.java';
       iosProjectPbxprojPath = 'ios/Runner.xcodeproj/project.pbxproj';
       macosAppInfoxprojPath = 'macos/Runner/Configs/AppInfo.xcconfig';
       launcherIconPath = 'assets/images/launcherIcon.png';
@@ -44,6 +48,18 @@ class FileRepository {
 
   Future<File> writeFile({required String filePath, required String content}) {
     return File(filePath).writeAsString(content);
+  }
+
+  File readFile({required String filePath}) {
+    return File(filePath);
+  }
+
+  Future<FileSystemEntity> copyFileToNewPath(
+      File file, String dirPath, String filePath) {
+    var newFileDirectory = Directory(dirPath);
+    newFileDirectory.createSync(recursive: true);
+    file.copy(filePath);
+    return file.delete();
   }
 
   Future<String?> getIosBundleId() async {
@@ -148,6 +164,37 @@ class FileRepository {
     }
   }
 
+  Future<File?> changeAndroidManifestBundle({String? bundleId}) async {
+    List? contentLineByLine = await readFileAsLineByline(
+      filePath: androidAppBuildGradlePath,
+    );
+    if (checkFileExists(contentLineByLine)) {
+      logger.w('''
+      Android BundleId could not be changed because,
+      The related file could not be found in that path:  $androidAppBuildGradlePath
+      ''');
+      return null;
+    }
+    for (var i = 0; i < contentLineByLine!.length; i++) {
+      if (contentLineByLine[i].contains('applicationId')) {
+        contentLineByLine[i] = '        applicationId \"$bundleId\"';
+      }
+
+      if (contentLineByLine[i].contains('manifestPlaceholders')) {
+        contentLineByLine[i] =
+            '        manifestPlaceholders += [appAuthRedirectScheme: \"${bundleId?.toLowerCase()}\"]';
+        break;
+      }
+    }
+    logger.i('New VERSION DETECTED');
+    var writtenFile = await writeFile(
+      filePath: androidAppBuildGradlePath,
+      content: contentLineByLine.join('\n'),
+    );
+    logger.i('Android bundleId changed successfully to : $bundleId');
+    return writtenFile;
+  }
+
   Future<File?> changeAndroidBundleId({String? bundleId}) async {
     List? contentLineByLine = await readFileAsLineByline(
       filePath: androidAppBuildGradlePath,
@@ -177,6 +224,48 @@ class FileRepository {
     );
     logger.i('Android bundleId changed successfully to : $bundleId');
     return writtenFile;
+  }
+
+  Future<File?> changeAndroidBundleIdMainActivity({String? bundleId}) async {
+    List? contentLineByLine = await readFileAsLineByline(
+      filePath: androidMainActivityPath,
+    );
+    if (checkFileExists(contentLineByLine)) {
+      logger.w('''
+      Android BundleId could not be changed because,
+      The related file could not be found in that path:  $androidMainActivityPath
+      ''');
+      return null;
+    }
+    if (contentLineByLine == null) {
+      return null;
+    }
+    for (var i = 0; i < 5; i++) {
+      if (contentLineByLine[i].contains('package')) {
+        contentLineByLine[i] = 'package $bundleId;';
+      }
+    }
+    logger.i('New VERSION DETECTED');
+    var writtenFile = await writeFile(
+      filePath: androidMainActivityPath,
+      content: contentLineByLine.join('\n'),
+    );
+
+    return writtenFile;
+  }
+
+  Future<void> moveAndroidMainActivityFileByBundleId({String? bundleId}) async {
+    var file = readFile(filePath: androidMainActivityPath);
+    var mapByBundleId = bundleId?.split('.').join('/');
+    if (mapByBundleId == null || mapByBundleId.contains('/')) {
+      logger.w('''
+      Android MainActivity file could not be moved by BundleId,
+      ''');
+    }
+    var dirPath = 'android/app/src/main/java/$mapByBundleId';
+    var filePath = '$dirPath/MainActivity.java';
+    await copyFileToNewPath(file, dirPath, filePath);
+    logger.i('Changed fileName/moved to: $dirPath');
   }
 
   Future<String?> getLinuxBundleId() async {
@@ -294,6 +383,32 @@ class FileRepository {
       content: contentLineByLine.join('\n'),
     );
     logger.i('Android appname changed successfully to : $appName');
+    return writtenFile;
+  }
+
+  Future<File?> changeAndroidBundleIdManifest(String? bundleId) async {
+    List? contentLineByLine = await readFileAsLineByline(
+      filePath: androidManifestPath,
+    );
+    if (checkFileExists(contentLineByLine)) {
+      logger.w('''
+      Android AppName could not be changed because,
+      The related file could not be found in that path:  $androidManifestPath
+      ''');
+      return null;
+    }
+    for (var i = 0; i < contentLineByLine!.length; i++) {
+      if (contentLineByLine[i]
+          .contains('package="com.appmachine.mobileclient"')) {
+        contentLineByLine[i] = '    package="$bundleId">';
+        break;
+      }
+    }
+    var writtenFile = await writeFile(
+      filePath: androidManifestPath,
+      content: contentLineByLine.join('\n'),
+    );
+    logger.i('Android appname changed successfully to : $bundleId');
     return writtenFile;
   }
 

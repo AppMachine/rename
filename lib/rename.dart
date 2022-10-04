@@ -43,6 +43,10 @@ Future changeBundleId(String? bundleId, Iterable<Platform> platforms) async {
   }
   if (platforms.isEmpty || platforms.contains(Platform.android)) {
     await fileRepository.changeAndroidBundleId(bundleId: bundleId);
+    await fileRepository.changeAndroidBundleIdManifest(bundleId);
+    await fileRepository.changeAndroidBundleIdMainActivity(bundleId: bundleId);
+    await fileRepository.moveAndroidMainActivityFileByBundleId(
+        bundleId: bundleId);
   }
   if (platforms.isEmpty || platforms.contains(Platform.linux)) {
     await fileRepository.changeLinuxBundleId(bundleId: bundleId);

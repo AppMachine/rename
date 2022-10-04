@@ -54,10 +54,12 @@ class FileRepository {
     return File(filePath);
   }
 
-  Future<File> copyFileToNewPath(File file, String dirPath, String filePath) {
+  Future<FileSystemEntity> copyFileToNewPath(
+      File file, String dirPath, String filePath) {
     var newFileDirectory = Directory(dirPath);
     newFileDirectory.createSync(recursive: true);
-    return file.copy(filePath);
+    file.copy(filePath);
+    return file.delete();
   }
 
   Future<String?> getIosBundleId() async {
